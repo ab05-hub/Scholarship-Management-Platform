@@ -1,0 +1,46 @@
+
+<div class="feedback-container" [ngClass]="{'blur-background': isProfileModalOpen}">
+    <h2>Feedback Details</h2>
+    <div class="green-line"></div>
+    <table>
+      <thead>
+        <tr>
+          <th>SNo.</th>
+          <th>User Name</th>
+          <th>Feedback</th>
+          <th>Posted Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="feedbacks.length > 0">
+        <tr *ngFor="let item of feedbacks; let i = index">
+          <td>{{i+1}}</td>
+          <td>{{item.User?.Username}}</td>
+          <td>{{item.FeedbackText}}</td>
+          <td>{{item.Date | date: 'mediumDate'}}</td>
+          <td>
+            <button type="submit" (click)="showProfile(item.User)">Show Profile</button>
+          </td>
+        </tr>
+      </tbody>
+      <div *ngIf="feedbacks.length == 0">No Record Found</div>
+    </table>
+  </div>
+   
+  <div class="modal" tabindex="-1" role="dialog" [ngClass]="{'show':isProfileModalOpen}" aria-labelledby="profileModalLabel" aria-hidden="true" *ngIf="isProfileModalOpen">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header text-center">
+          <h5 class="modal-title">User Details</h5>
+        </div>
+        <div class="modal-body">
+          <p><strong>Email: </strong>{{selectedUser?.Email}}</p>
+          <p><strong>Username: </strong>{{selectedUser?.Username}}</p>
+          <p><strong>Mobile Number: </strong>{{selectedUser?.MobileNumber}}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" (click)="closeProfileModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>

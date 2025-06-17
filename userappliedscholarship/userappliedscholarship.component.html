@@ -1,0 +1,46 @@
+<div>
+    <h1> Applied Scholarships </h1>
+    <hr class="heading-line">
+    <input type="text" id="searchInput" placeholder="Search Scholarships" [(ngModel)]="searchQuery" (input)="searchScholarships()">
+    <!-- <button (click)="searchInvestments()">Search</button> -->
+   
+    <table>
+        <thead>
+            <tr>
+                <th>S.No</th>
+                <th>Scholarship Name</th>
+                <th>Application Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let scholarship of filteredScholarships; let i = index">
+              <td>{{ i + 1 }}</td>
+                <td>{{scholarship.Scholarship.Name}}</td>
+                <td>{{scholarship.ApplicationDate | date}}</td>
+                <td>{{scholarship.ApplicationStatus}}</td>
+                <td>
+                  <!-- <button (click)="confirmDelete(investment.InvestmentAppliactionId)">Delete</button> -->
+                  <button (click)="openDialog(scholarship)">Delete</button>
+                </td>
+            </tr>
+        </tbody>
+        <p *ngIf="filteredScholarships.length == 0">Oops! No records found</p>
+    </table>
+   
+    <div class="modal" tabindex="-1" role="dialog" [ngClass]="{'show':isDialogOpen}" aria-labelledby="profileModalLabel" style="display: block;" *ngIf="isDialogOpen">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-body text-center" style="font-family: 'Gilroy-Medium',sans-serif;">
+            <p><strong>Are you sure you want to delete ?</strong></p>
+          </div>
+          <div class="modal-footer">
+            <button (click)="confirmDelete()">Yes, Delete</button>
+            <button type="button" class="btn btn-danger" (click)="closeDialog()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+   
+  </div>

@@ -1,0 +1,1101 @@
+********************Models********************
+1) ApplicationUser.cs
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
+
+namespace dotnetapp.Models
+{
+    public class ApplicationUser : IdentityUser
+    {
+        [Required, MaxLength(30)]
+        public string Name { get; set; }
+    }
+}
+
+2) Feedback.cs
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace dotnetapp.Models
+{
+    public class Feedback
+    {
+        [Key]
+        public int FeedbackId { get; set; }
+        public int UserId { get; set; }
+
+        [ForeignKey("UserId")]
+        public User? User { get; set; }
+        public string FeedbackText { get; set; }
+
+        [DataType(DataType.DateTime)]
+        public DateTime Date { get; set; }
+    }
+}
+
+3) LoginModel.cs
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace dotnetapp.Models
+{
+    public class LoginModel
+    {
+        public string Email { get; set; }
+        public string Password { get; set; }
+    }
+}
+
+4) Scholarship.cs 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
+namespace dotnetapp.Models
+{
+    public class Scholarship
+    {
+        [Key]
+        public int ScholarshipId { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string EligibilityCriteria { get; set; }
+        public decimal Amount { get; set; }
+        [DataType(DataType.DateTime)]
+        public DateTime Deadline { get; set; }
+        public string Category { get; set; }
+        public int NumberOfAwards { get; set; }
+        public string Sponsor { get; set; }
+
+    // Navigational Property
+        [JsonIgnore]
+        public ICollection<ScholarshipApplication>? ScholarshipApplications { get; set; }
+    }
+}
+
+5) ScholarshipApplication.cs
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace dotnetapp.Models
+{
+    public class ScholarshipApplication
+    {
+        [Key]
+        public int ScholarshipApplicationId { get; set; }
+        public int UserId { get; set; }
+        
+        [ForeignKey("UserId")]
+        public User? User { get; set; }
+        public int ScholarshipId { get; set; }
+
+        [ForeignKey("ScholarshipId")]
+        public Scholarship? Scholarship { get; set; }
+
+        [DataType(DataType.DateTime)]
+        public DateTime ApplicationDate { get; set; }
+        public string ApplicationStatus { get; set; }
+        public string Essay { get; set; }
+        public string? Remarks { get; set; }
+        public string? SupportingDocuments { get; set; }
+        
+    }
+}
+
+6) User.cs
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
+namespace dotnetapp.Models
+{
+    public class User
+    {
+        [Key]
+        public int UserId { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string Username { get; set; }
+        public string MobileNumber { get; set; }
+        public string UserRole { get; set; }
+
+        //Navigational Properties
+        [JsonIgnore]
+        public ICollection<ScholarshipApplication>? ScholarshipApplications { get; set; }
+        [JsonIgnore]
+        public ICollection<Feedback>? Feedbacks { get; set; }
+    }
+}
+
+7)UserRoles.cs
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+
+namespace dotnetapp.Models
+{
+    public class UserRoles
+    {
+        public const string Admin = "Admin";
+        public const string User = "User";
+    }
+}
+
+
+
+***************************Exceptions****************************
+
+1)ScholarshipException.cs
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace dotnetapp.Exceptions
+{
+    public class ScholarshipException : Exception
+    {
+        public ScholarshipException(string message) : base(message)
+        {
+            
+        }
+    }
+}
+
+
+*********************Data**************************
+
+1)ApplicationDbContext.cs
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using dotnetapp.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using System.Diagnostics.Contracts;
+
+namespace dotnetapp.Data
+{
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        {
+        }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Scholarship> Scholarships { get; set; }
+        public DbSet<ScholarshipApplication> ScholarshipApplications { get; set; }
+        public DbSet<Feedback> Feedbacks { get; set; }
+
+    }
+}
+
+
+
+*******************************Services**************************
+1) AuthService.cs
+
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System;
+using System.Text;
+using Test.Models;
+namespace Test.Services
+{
+    public class AuthService: IAuthService
+    {
+        private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IConfiguration _configuration;
+        public AuthService(
+            ApplicationDbContext context,
+            IConfiguration configuartion,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            RoleManager<IdentityRole> roleManager
+        )
+        {
+            this._context = context;
+            this._configuration = configuartion;
+            this._userManager = userManager;
+            this._signInManager = signInManager;
+            this._roleManager = roleManager;
+        }
+        public async Task<(int, string)> Registration(User model, string role)
+        {
+            var userNameExists = await _userManager.FindByNameAsync(model.Username);
+            if (userNameExists != null)
+            {
+                return (0, "User name already exists");
+            }
+            var emailExists = await _userManager.FindByEmailAsync(model.Email);
+            if (emailExists != null)
+            {
+                return (0, "A user with this email already exists");
+            }
+            ApplicationUser applicationUser = new()
+            {
+                Email = model.Email,
+                UserName = model.Username
+            };
+            IdentityResult result = await _userManager.CreateAsync(applicationUser, model.Password);
+            if (result.Succeeded && (role == UserRoles.Admin || role == UserRoles.User))
+            {
+                if (!await _roleManager.RoleExistsAsync(role))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole(role));
+                }
+                await _userManager.AddToRoleAsync(applicationUser, role);
+                await _context.Users.AddAsync(model);
+                await _context.SaveChangesAsync();
+                return (1, "User Created Successfully");
+            }
+            return (0, "Failed to register user, please check user details");
+        }
+        public async Task<(int, string)> Login(LoginModel model)
+        {
+            ApplicationUser savedUser = await _userManager.FindByEmailAsync(model.Email);
+            if (savedUser == null)
+            {
+                return (0, "Invalid email");
+            }
+            var result = await _signInManager.PasswordSignInAsync(savedUser.UserName, model.Password, false, lockoutOnFailure: false);
+            if (result.Succeeded)
+            {
+                //Retreiving User from Db to save UserId in Claims
+                var customUser = _context.Users.FirstOrDefault(u => u.Email == model.Email);
+                if (customUser == null)
+                {
+                    return (0, "Invalid email");
+                }
+                IList<string> roles = await _userManager.GetRolesAsync(savedUser);
+                List<Claim> claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, savedUser.UserName),
+                    new Claim(ClaimTypes.Email, savedUser.Email),
+                    //Saving UserId in token
+                    new Claim(ClaimTypes.NameIdentifier, customUser.UserId.ToString()),
+                    new Claim(ClaimTypes.Role, roles.FirstOrDefault("User"))
+                };
+                string token = GenerateJwtToken(claims);
+                return (1, token);
+            }
+            return (0, "Invalid password");
+        }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "S6781:JWT secret keys should not be disclosed.", Justification = "Key is securely stored.")]
+        private string GenerateJwtToken(List<Claim> claims)
+        {
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            var key = _configuration["Jwt:Key"];
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new InvalidOperationException("JWT key is missing");
+            }
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+            var crendentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
+            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddHours(3),
+                Issuer = _configuration["Jwt:Issuer"],
+                Audience = _configuration["Jwt:Audience"],
+                SigningCredentials = crendentials
+            };
+            SecurityToken generatedToken = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(generatedToken);
+        }
+    }
+}
+
+
+2) FeedbackService.cs
+
+using System;
+using Test.Models;
+using Test.Exceptions;
+
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+namespace Test.Services
+{
+    public class FeedbackService
+    {
+        private readonly ApplicationDbContext _context;
+
+        public FeedbackService(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<IEnumerable<Feedback>> GetAllFeedbacks()
+        {
+            // _context.Feedbacks.
+            return await _context.Feedbacks
+                .Include(f => f.User)
+                .ToListAsync();
+        }
+
+        /* method to get Feedback of a particular user with userId */
+        public async Task<IEnumerable<Feedback>> GetFeedbacksByUserId(int userId)
+        {
+
+            return await _context.Feedbacks
+                .Include(f => f.User)
+                .Where(f => f.UserId == userId)
+                .ToListAsync();
+        }
+
+        /* method to add a Feedback */
+        public async Task<bool> AddFeedback(Feedback feedback)
+        {
+            feedback.User = null;
+            await _context.Feedbacks.AddAsync(feedback);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
+        public async Task<bool> DeleteFeedback(int FeedbackId)
+        {
+            var exs = await _context.Feedbacks.FindAsync(FeedbackId);
+            if (exs == null)
+            {
+                return false;
+            }
+            _context.Feedbacks.Remove(exs);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+    }
+}
+
+
+3) IAuthService.cs
+using Test.Models;
+
+namespace Test.Services
+{
+    public interface IAuthService
+    {
+        Task<(int, string)> Registration(User model, string role);
+        Task<(int, string)> Login(LoginModel model);
+    }
+}
+
+
+4) ScholarshipApplicationService.cs
+using System;
+using Test.Models;
+using Test.Exceptions;
+
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+namespace Test.Services
+{
+    public class ScholarshipApplicationService
+    {
+        private readonly ApplicationDbContext _context;
+
+        public ScholarshipApplicationService(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        /* Retrieves all scholarship applications from the database. */
+        public async Task<IEnumerable<ScholarshipApplication>> GetAllScholarshipApplications()
+        {
+            return await _context.ScholarshipApplications.Include(i => i.User).Include(i => i.Scholarship).ToListAsync();
+        }
+
+        /* Retrieves a scholarship application by user ID. */
+        public async Task<IEnumerable<ScholarshipApplication>> GetScholarshipApplicationsByUserId(int userId)
+        {
+            var scholarships = await _context.ScholarshipApplications
+                                     .Where(sa => sa.UserId == userId)
+                                     .ToListAsync();
+            return scholarships;
+        }
+
+        /* Adds a new scholarship application to the database. */
+        public async Task<bool> AddScholarshipApplication(ScholarshipApplication scholarshipApplication)
+        {
+            // Checks if the user has already applied for this scholarship
+            bool exists = await _context.ScholarshipApplications.AnyAsync(sa =>
+                sa.UserId == scholarshipApplication.UserId &&
+                sa.ScholarshipId == scholarshipApplication.ScholarshipId);
+
+            if (exists)
+                throw new ScholarshipException("User already applied for this scholarship");
+
+            await _context.ScholarshipApplications.AddAsync(scholarshipApplication);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        /* Updates an existing scholarship application in the database. */
+        public async Task<bool> UpdateScholarshipApplication(int scholarshipApplicationId, ScholarshipApplication scholarshipApplication)
+        {
+            var existingApplication = await _context.ScholarshipApplications.FindAsync(scholarshipApplicationId);
+
+            if (existingApplication == null)
+                return false;
+
+            // Update all fields
+            existingApplication.UserId = scholarshipApplication.UserId;
+            existingApplication.ScholarshipId = scholarshipApplication.ScholarshipId;
+            existingApplication.ApplicationDate = scholarshipApplication.ApplicationDate;
+            existingApplication.ApplicationStatus = scholarshipApplication.ApplicationStatus;
+            existingApplication.Remarks = scholarshipApplication.Remarks;
+            existingApplication.Essay = scholarshipApplication.Essay; // Ensure all fields are updated
+            existingApplication.SupportingDocuments = scholarshipApplication.SupportingDocuments;
+
+            // _context.ScholarshipApplications.Update(existingApplication);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        /* Deletes a scholarship application from the database. */
+        public async Task<bool> DeleteScholarshipApplication(int scholarshipApplicationId)
+        {
+            var application = await _context.ScholarshipApplications.FindAsync(scholarshipApplicationId);
+            if (application == null)
+                return false;
+
+            _context.ScholarshipApplications.Remove(application);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        public int GetApplicationCountForScholarship(int scholarshipId)
+        {
+            return _context.ScholarshipApplications.Count(sa => sa.ScholarshipId == scholarshipId);
+        }
+    }
+}
+
+5) ScholarshipService.cs
+
+using System;
+using Test.Models;
+using Test.Exceptions;
+
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+namespace Test.Services
+{
+    public class ScholarshipService
+    {
+        private readonly ApplicationDbContext _context;
+
+        public ScholarshipService(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        // 1. Get all scholarships
+        public async Task<IEnumerable<Scholarship>> GetAllScholarships()
+        {
+            return await _context.Scholarships.ToListAsync();
+        }
+
+        // 2. Get scholarship by ID
+        public async Task<Scholarship> GetScholarshipById(int scholarshipId)
+        {
+            var scholarship = await _context.Scholarships.FindAsync(scholarshipId);
+            return scholarship;
+        }
+
+        // 3. Add a new scholarship
+        public async Task<bool> AddScholarship(Scholarship scholarship)
+        {
+            // Check if a scholarship with the same name exists
+            bool exists = await _context.Scholarships.AnyAsync(s => s.Name == scholarship.Name);
+            if (exists)
+            {
+                throw new ScholarshipException("Scholarship with the same name already exists");
+            }
+            _context.Scholarships.Add(scholarship);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // 4. Update an existing scholarship
+        public async Task<bool> UpdateScholarship(int scholarshipId, Scholarship scholarship)
+        {
+            var existingScholarship = await _context.Scholarships.FindAsync(scholarshipId);
+            if (existingScholarship == null)
+            {
+                return false;
+            }
+            // Check if another scholarship with the same name exists
+            bool exists = await _context.Scholarships.AnyAsync(s => s.Name == scholarship.Name && s.ScholarshipId != scholarshipId);
+            if (exists)
+            {
+                throw new ScholarshipException("Scholarship with the same name already exists");
+            }
+            // Update scholarship details
+            existingScholarship.Name = scholarship.Name;
+            existingScholarship.Description = scholarship.Description;
+            existingScholarship.EligibilityCriteria = scholarship.EligibilityCriteria;
+            existingScholarship.Amount = scholarship.Amount;
+            existingScholarship.Deadline = scholarship.Deadline;
+            existingScholarship.Category = scholarship.Category;
+            existingScholarship.NumberOfAwards = scholarship.NumberOfAwards;
+            existingScholarship.Sponsor = scholarship.Sponsor;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // 5. Delete a scholarship
+        public async Task<bool> DeleteScholarship(int scholarshipId)
+        {
+            var scholarship = await _context.Scholarships.FindAsync(scholarshipId);
+            if (scholarship == null)
+            {
+                return false;
+            }
+            // Check if the scholarship is referenced in ScholarshipApplication
+            bool isReferenced = await _context.ScholarshipApplications.AnyAsync(sa => sa.ScholarshipId == scholarshipId);
+            if (isReferenced)
+            {
+                throw new ScholarshipException("Scholarship cannot be deleted, it is referenced in ScholarshipApplication");
+            }
+            _context.Scholarships.Remove(scholarship);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+    }
+}
+
+
+
+
+*******************************************Controllers****************************************
+
+1) AuthenticationController.cs
+
+using Test.Models;
+using Test.Services;
+using Microsoft.AspNetCore.Mvc;
+namespace Test.Controllers
+{
+    [ApiController]
+    [Route("api/")]
+    public class AuthenticationController:ControllerBase
+    {
+        private readonly IAuthService _authService;
+        public AuthenticationController(IAuthService authService)
+        {
+            this._authService = authService;
+        }
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginModel model)
+        {
+            try
+            {
+                var (status, message) = await _authService.Login(model);
+                if (status == 0)
+                {
+                    return BadRequest(message);
+                }
+                return Ok(
+                    new
+                    {
+                        Status = "Success",
+                        token = message
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                        StatusCodes.Status500InternalServerError,
+                        new { Status = "Error", Message = ex.Message }
+                    );
+            }
+        }
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(User model)
+        {
+            try
+            {
+                var (status, message) = await _authService.Registration(model, model.UserRole);
+                if (status == 0)
+                {
+                    return BadRequest(message);
+                }
+                return Ok(new { msg = message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                        StatusCodes.Status500InternalServerError,
+                        new { Status = "Error", Message = ex.Message }
+                    );
+            }
+        }
+
+    }
+}
+
+
+2)FeedbackController.cs
+
+
+using Test.Models;
+using Test.Exceptions;
+using Test.Services;
+using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+namespace Test.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class FeedbackController: ControllerBase
+    {
+        private readonly FeedbackService _services;
+
+        public FeedbackController(FeedbackService service)
+        {
+            _services = service;
+        }
+
+        
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Feedback>>> GetAllFeedbacks()
+        {
+            try
+            {
+                /* method to get all the feedbacks
+                  returns all the feedbacks
+                  if the list is empty then its a bad request
+                 */
+                var exs = await _services.GetAllFeedbacks();
+                Console.WriteLine(exs);
+                return Ok(exs);
+            }
+            catch (SystemException ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<IEnumerable<Feedback>>> GetFeedbacksByUserId(int userId)
+        {
+            try
+            {
+                /* method to get a Feedback of a User by its id
+                   if exists then return Feedback
+                   else Bad request
+                 */
+                var exs = await _services.GetFeedbacksByUserId(userId);
+                return Ok(exs);
+            }
+            catch (SystemException ex)
+            {
+                return StatusCode(200, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        
+        [HttpPost]
+        public async Task<ActionResult> AddFeedback([FromBody] Feedback feedback)
+        {
+            try
+            {
+                /* method to add a Feedback */
+                var exs = await _services.AddFeedback(feedback);
+                if (exs != null)
+                {
+                    return Ok(new { msg = "Feedback added successfully" });
+                }
+                else
+                {
+                    return BadRequest("Failed to get the data");
+                }
+            }
+            catch (SystemException ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        
+        [HttpDelete("{feedbackId}")]
+        public async Task<ActionResult> DeleteFeedback(int feedbackId)
+        {
+            try
+            {
+                /* check if the Feedback object to be deleted is avalailable
+                    if available, delete the Feedback
+                    else return NotFound
+                 */
+                bool isDeleted = await _services.DeleteFeedback(feedbackId);
+                if (isDeleted)
+                {
+                    return Ok(new { msg = "Feedback deleted successfully" });
+                }
+                return NotFound("Cannot find any feedback");
+            }
+            catch (SystemException ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+    }
+}
+
+3) ScholarshipApplicationController.cs
+
+using Test.Models;
+using Test.Exceptions;
+using Test.Services;
+using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+namespace Test.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ScholarshipApplicationController : ControllerBase
+    {
+        private readonly ScholarshipApplicationService _scholarshipApplicationServices;
+
+        public ScholarshipApplicationController(ScholarshipApplicationService service)
+        {
+            _scholarshipApplicationServices = service;
+        }
+
+        /* Fetches all scholarship applications. Returns a list of Scholarship applications or a 500 status code on error. */
+        
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ScholarshipApplication>>> GetAllScholarshipApplications()
+        {
+            try
+            {
+                var scholarships = await _scholarshipApplicationServices.GetAllScholarshipApplications();
+                return Ok(scholarships);
+            }
+            catch (SystemException ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /* Fetches a scholarship application by user ID. Returns the specific Scholarship application or a 404/500 status code. */
+       
+        [HttpGet("{userId}")]
+        public async Task<ActionResult<ScholarshipApplication>> GetScholarshipApplicationByUserId(int userId)
+        {
+            try
+            {
+                var exs = await _scholarshipApplicationServices.GetScholarshipApplicationsByUserId(userId);
+                if (exs != null)
+                {
+                    return Ok(exs);
+                }
+                return NotFound("Cannot Find any scholarship application");
+            }
+            catch (SystemException ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /* Adds a new scholarship application. Returns success or a 400/500 status code on failure. */
+        
+        [HttpPost]
+        public async Task<ActionResult> AddScholarshipApplication([FromBody] ScholarshipApplication scholarshipApplication)
+        {
+            try
+            {
+                bool isAdded = await _scholarshipApplicationServices.AddScholarshipApplication(scholarshipApplication);
+                if (isAdded)
+                    return Ok(new { mssg = "Scholarship application added successfully" });
+                else
+                {
+                    return BadRequest("Failed to add scholarship application");
+                }
+            }
+            catch (SystemException ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /* Updates an existing scholarship application by ID. Returns success or a 404/400/500 status code. */
+        
+        [HttpPut("{scholarshipApplicationId}")]
+        public async Task<ActionResult> UpdateScholarshipApplication(int scholarshipApplicationId, [FromBody] ScholarshipApplication scholarshipApplication)
+        {
+            try
+            {
+                var isUpdated = await _scholarshipApplicationServices.UpdateScholarshipApplication(scholarshipApplicationId, scholarshipApplication);
+                if (isUpdated)
+                {
+                    return Ok(new { mssg = "Scholarship application updated successfully" });
+                }
+                return NotFound("Cannot find any scholarship.");
+            }
+            catch (ScholarshipException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /* Deletes a scholarship application by ID. Returns success or a 404/500 status code. */
+        
+        [HttpDelete("{scholarshipApplicationId}")]
+        public async Task<ActionResult> DeleteScholarshipApplication(int scholarshipApplicationId)
+        {
+            try
+            {
+                bool isDeleted = await _scholarshipApplicationServices.DeleteScholarshipApplication(scholarshipApplicationId);
+                if (isDeleted)
+                {
+                    return Ok(new { msg = "Scholarship deleted successfully" });
+                }
+                return NotFound("Cannot find any scholarship.");
+            }
+            catch (ScholarshipException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        public IActionResult GetApplicationCount(int scholarshipId)
+        {
+            try
+            {
+                var count = _scholarshipApplicationServices.GetApplicationCountForScholarship(scholarshipId);
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                Console.WriteLine($"Error getting application count for scholarship ID {scholarshipId}: {ex.Message}");
+                return StatusCode(500, "An error occurred while retrieving the application count.");
+            }
+        }
+    }
+}
+
+
+4) ScholarshipController.cs
+
+using Test.Models;
+using Test.Exceptions;
+using Test.Services;
+using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+namespace Test.Controllers
+{
+    [ApiController]
+    [Route("api/scholarship")]
+    public class ScholarshipController:ControllerBase
+    {
+        private readonly ScholarshipService _service;
+
+        public ScholarshipController(ScholarshipService service)
+        {
+            _service = service;
+        }
+
+        // 1. Get all scholarships
+        
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Scholarship>>> GetAllScholarships()
+        {
+            try
+            {
+                var scholarships = await _service.GetAllScholarships();
+                return Ok(scholarships);
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // 2. Get scholarship by scholarshipId
+       
+        [HttpGet("{scholarshipId}")]
+        public async Task<ActionResult<Scholarship>> GetScholarshipById(int scholarshipId)
+        {
+            try
+            {
+                var scholarship = await _service.GetScholarshipById(scholarshipId);
+                return Ok(scholarship);
+            }
+            catch (ScholarshipException)
+            {
+                return NotFound("Cannot find any scholarship");
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // 3. Add a new scholarship
+        
+        [HttpPost]
+        public async Task<ActionResult> AddScholarship([FromBody] Scholarship scholarship)
+        {
+            try
+            {
+                bool isAdded = await _service.AddScholarship(scholarship);
+                if (isAdded)
+                {
+                    return Ok(new { mssg = "Scholarship added successfully" });
+                }
+                //return Internal Server Error
+                return StatusCode(500, "Failed to add scholarship");
+            }
+            catch (ScholarshipException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // 4. Update an existing scholarship
+       
+        [HttpPut("{scholarshipId}")]
+        public async Task<ActionResult> UpdateScholarship(int scholarshipId, [FromBody] Scholarship scholarship)
+        {
+            try
+            {
+                bool isUpdated = await _service.UpdateScholarship(scholarshipId, scholarship);
+                if (isUpdated)
+                {
+                    return Ok(new { mssg = "Scholarship updated successfully" });
+                }
+                return NotFound("Cannot find any scholarship.");
+            }
+            catch (ScholarshipException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // 5. Delete a scholarship
+        
+        [HttpDelete("{scholarshipId}")]
+        public async Task<ActionResult> DeleteScholarship(int scholarshipId)
+        {
+            try
+            {
+                bool isDeleted = await _service.DeleteScholarship(scholarshipId);
+                if (isDeleted)
+                {
+                    return Ok(new { mssg = "Scholarship deleted successfully" });
+                }
+                return NotFound("Cannot find any scholarship.");
+            }
+            catch (ScholarshipException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+    }
+}

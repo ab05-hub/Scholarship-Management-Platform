@@ -1,0 +1,29 @@
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-image: linear-gradient(135deg, #3B2667 10%, #BC78EC 100%);
+    padding: 10px 20px;
+}
+
+.left-links a, .right-links a {
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+    padding: 8px 16px;
+    transition: background-color 0.3s;
+}
+
+.right-links a {
+    margin-left: 15px;
+}
+
+.left-links a:hover, .right-links a:hover {
+    background-color: rgba(255, 255, 255, 0.15); 
+}

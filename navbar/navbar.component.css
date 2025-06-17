@@ -1,0 +1,140 @@
+.body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+ 
+.hero {
+    margin-top: 10px;
+    background: linear-gradient(to right, #7354b6, #39045f);
+    color: white;
+    padding: 60px 20px;
+    text-align: center;
+}
+ 
+.hero-content {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 1200px;
+/*     margin: 0 auto 20px; */
+}
+ 
+ 
+ 
+.advertisement {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    flex-grow: 1;
+    margin-left: 20px;
+}
+ 
+.advertisement h2 {
+    margin-top: 0;
+    color: #3B2667;
+}
+ 
+.advertisement p {
+    margin: 10px 0;
+    color: #666;
+}
+ 
+.advertisement .ad-button {
+    background-color: #4CAF50;
+    color: white;
+    margin-top: 10px;
+}
+ 
+.advertisement .ad-button:hover {
+    background-color: #388E3C;
+}
+ 
+.hero h1 {
+    margin: 0;
+    font-size: 2.5em;
+}
+ 
+.hero p {
+    margin: 10px 0;
+    font-size: 1.2em;
+}
+ 
+.cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+/*     margin: 20px; */
+    max-width: 1200px;
+    margin: 20px auto;
+}
+ 
+.card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin: 10px;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+}
+ 
+.card:hover {
+    transform: scale(1.05);
+}
+ 
+.card img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+ 
+.card h3 {
+    margin: 15px 0 10px;
+    font-size: 1.2em;
+    color: #3B2667;
+}
+ 
+.card p {
+    font-size: 0.9em;
+    color: #666;
+}
+ 
+.card a {
+    color: #3B2667;
+    text-decoration: none;
+    font-weight: bold;
+    display: block;
+    margin-top: 10px;
+    transition: color 0.3s;
+}
+ 
+.card a:hover {
+    color: #BC78EC;
+}
+ 
+.footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #3B2667;
+    color: white;
+    margin-top: 20px;
+}
+ 
+.footer a {
+    color: white;
+    text-decoration: none;
+    margin: 0 10px;
+    transition: color 0.3s;
+}
+ 
+.footer a:hover {
+    color: #BC78EC;
+}

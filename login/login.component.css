@@ -1,0 +1,176 @@
+body {
+    margin: 10px;
+    padding: 0;
+    height: 100vh;
+    background-image: linear-gradient(to top, #7028e4 0%, #e5b2ca 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    display: flex;
+    width: 70%;
+    max-width: 1200px;
+    background-image: linear-gradient(-20deg, #e9defa 0%, #fbfcdb 100%);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+ 
+.image-container {
+    margin-top: 10px;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+ 
+.image-container img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+ 
+.login-container {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+ 
+.login-container h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-family: 'Gilroy-Bold', sans-serif;
+}
+ 
+.login-container .form-group {
+    margin-bottom: 20px; /* Increased margin for better spacing */
+}
+ 
+.login-container .form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+ 
+.login-container .form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+}
+ 
+.login-container .form-group .error-message {
+    margin-top: 5px;
+    font-size: 0.9em;
+}
+ 
+.in {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    margin-top: 10px;
+}
+ 
+.in:hover {
+    background-color: #45a049;
+}
+ 
+.login-container p {
+    text-align: center;
+    margin-top: 20px;
+}
+
+
+.google-btn {
+
+    display: flex;
+
+    align-items: center;
+
+    background-color: white;
+
+    border: 1px solid #dadce0;
+
+    border-radius: 4px;
+
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+
+    color: #3c4043;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    height: 40px;
+
+    padding: 0;
+
+    transition: background-color 0.2s, box-shadow 0.2s;
+
+  }
+
+  .google-btn:hover {
+
+    background-color: #f8f9fa;
+
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+
+  }
+
+  .google-btn:active {
+
+    background-color: #f1f3f4;
+
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  }
+
+  .google-icon-wrapper {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    width: 40px;
+
+    height: 100%;
+
+    padding-left: 8px;
+
+  }
+
+  .google-icon {
+
+    width: 18px;
+
+    height: 18px;
+
+  }
+
+  .btn-text {
+
+    padding: 0 12px 0 6px;
+
+    font-family: 'Roboto', Arial, sans-serif;
+
+  }
+
+  .google{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }

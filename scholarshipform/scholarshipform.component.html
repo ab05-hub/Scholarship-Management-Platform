@@ -1,0 +1,49 @@
+<div class="container">
+    <div class="card mt-3 mx-2">
+      <form [formGroup]="scholarshipApplicationForm" (ngSubmit)="applyForScholarship()">
+        <div class="card-header text-center">
+          <h1>
+            Scholarship Application Form
+            <button class="btn btn-secondary" [routerLink]="['/userviewscholarship']">Back</button>
+          </h1>
+        </div>
+        <div class="form-group">
+          <label for="essay">Essay <span style="color: red;">*</span></label>
+          <textarea id="essay" formControlName="Essay" class="form-control"></textarea>
+          <div *ngIf="scholarshipApplicationForm.get('Essay')?.touched && scholarshipApplicationForm.get('Essay')?.invalid" class="text-danger">
+            Essay is required
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="remarks">Remarks <span style="color: red;">*</span></label>
+          <textarea id="remarks" formControlName="Remarks" class="form-control"></textarea>
+          <div *ngIf="scholarshipApplicationForm.get('Remarks')?.touched && scholarshipApplicationForm.get('Remarks')?.invalid" class="text-danger">
+            Remarks are required
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="supportingDocument">Supporting Document <span style="color: red;">*</span></label>
+          <input type="file" id="supportingDocument" (change)="onFileChange($event)" class="form-control" multiple />
+          <div *ngIf="scholarshipApplicationForm.get('SupportingDocuments')?.touched && scholarshipApplicationForm.get('SupportingDocuments')?.invalid" class="text-danger">
+            Supporting Document is required
+          </div>
+        </div>
+  
+        <div *ngIf="scholarshipApplicationForm.invalid" class="text-danger">
+          *All fields are required
+        </div>
+  
+        <button [disabled]="scholarshipApplicationForm.invalid" type="submit" class="btn btn-success form-control">Submit</button>
+      </form>
+    </div>
+  </div>
+  
+  <div *ngIf="isDialogOpen" class="dialog">
+    <div class="dialog-content">
+      <p><b>Application Submitted Successfully!</b></p>
+      <button class="btn btn-danger" (click)="closeDialog()">OK</button>
+    </div>
+  </div>
+  

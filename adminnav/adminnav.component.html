@@ -1,0 +1,26 @@
+<nav class="navbar">
+ 
+    <div class="navbar-left">
+        <a href="#" class="navbar-brand">Scholarship Portal</a>
+    </div>
+    <div class="navbar-right">
+        <div class="dropdown">
+            <button class="dropbtn white-bg">AdminDemo/Admin</button>
+            <!-- <div class="dropdown-content">
+                <a href="#">Admin</a>
+                <a href="#">User</a>
+            </div> -->
+        </div>
+        <a href="#" routerLink="/navbar">Home</a>
+        <div class="dropdown">
+            <button class="dropbtn">Scholarship</button>
+            <div class="dropdown-content">
+                <a href="#" routerLink="/createscholarship">Apply</a>
+                <a href="#" routerLink="/viewscholarship">Status</a>
+            </div>
+        </div>
+        <a href="#" routerLink="/requestedscholarship">Scholarship Requested</a>
+        <a href="#" routerLink="/adminviewfeedback">Feedback</a>
+        <a href="#" id="logout-btn" (click)="onLogout()" [routerLink]="['/login']">Logout</a>
+    </div>
+</nav>

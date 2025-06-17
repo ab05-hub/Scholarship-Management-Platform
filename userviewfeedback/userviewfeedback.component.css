@@ -1,0 +1,75 @@
+body {
+    font-family: 'Gilroy-Regular', sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+/* Table Styles */
+.table {
+    margin-top: 20px;
+    border-collapse: collapse;
+    width: 100%;
+}
+.table th, .table td {
+    padding: 12px;
+    text-align: center;
+}
+.table thead {
+    background-color: rgb(87, 21, 135);
+    color: #fff;
+}
+.table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.table tbody tr:hover {
+    background-color: #ddd;
+}
+.table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+ 
+.table tbody tr:hover {
+    background-color: #ddd;
+}
+/* Button Styles */
+.btn-custom-delete {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.btn-custom-delete:hover {
+    background-color: #c82333;
+}
+/* Modal Styles */
+.modal-content {
+    border-radius: 8px;
+}
+.modal-body {
+    font-size: 16px;
+    padding: 20px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
+}
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.btn-danger:hover {
+    background-color: #c82333;
+}
+/* Blur Background */
+.blur-background {
+    filter: blur(5px);
+}

@@ -1,0 +1,96 @@
+
+<div id="successDialog" class="dialog">
+    <div class="dialog-content">
+        <h2 class="success-title">Success</h2>
+        <p class="success-message">Scholarship added successfully.</p>
+        <button (click)="closeDialog('successDialog')">OK</button>
+    </div>
+</div>
+
+<div id="errorDialog" class="dialog">
+    <div class="dialog-content">
+        <h2 class="error-title">Error</h2>
+        <p class="error-message"></p>
+        <button (click)="closeDialog('errorDialog')">OK</button>
+    </div>
+</div>
+
+<form #scholarshipForm="ngForm" (ngSubmit)="addScholarship()">
+    <h1>Create New Scholarship</h1>
+    <hr>
+    <div class="form-grid">
+        <div class="form-group">
+            <label for="Name">Name:<span style="color: red;">*</span></label>
+            <input type="text" id="Name" name="Name" [(ngModel)]="newScholarship.Name" required>
+            <div class="error-message" style="color: red;" *ngIf="scholarshipForm.submitted && scholarshipForm.controls['Name']?.invalid">
+                Name is required
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Description">Description:<span style="color: red;">*</span></label>
+            <textarea id="Description" name="Description" rows="4" [(ngModel)]="newScholarship.Description" required></textarea>
+            <div class="error-message" style="color: red;" *ngIf="scholarshipForm.submitted && scholarshipForm.controls['Description']?.invalid">
+                Description is required
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="EligibilityCriteria">Eligibility Criteria:<span style="color: red;">*</span></label>
+            <input type="text" id="EligibilityCriteria" name="EligibilityCriteria" [(ngModel)]="newScholarship.EligibilityCriteria" required>
+            <div class="error-message" style="color: red;" *ngIf="scholarshipForm.submitted && scholarshipForm.controls['EligibilityCriteria']?.invalid">
+                Eligibility Criteria is required
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Deadline">Deadline:<span style="color: red;">*</span></label>
+            <input type="date" id="Deadline" name="Deadline" [(ngModel)]="newScholarship.Deadline" [min]="minDate" required>
+            <div class="error-message" style="color: red;" *ngIf="scholarshipForm.submitted && scholarshipForm.controls['Deadline']?.invalid">
+                Deadline is required
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Category">Category:<span style="color: red;">*</span></label>
+            <input type="text" id="Category" name="Category" [(ngModel)]="newScholarship.Category" required>
+            <div class="error-message" style="color: red;" *ngIf="scholarshipForm.submitted && scholarshipForm.controls['Category']?.invalid">
+                Category is required
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="NumberOfAwards">Number of Awards:<span style="color: red;">*</span></label>
+            <input type="number" id="NumberOfAwards" name="NumberOfAwards" [(ngModel)]="newScholarship.NumberOfAwards" required>
+            <div class="error-message" style="color: red;" *ngIf="scholarshipForm.submitted && scholarshipForm.controls['NumberOfAwards']?.invalid">
+                Number of Awards is required
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Amount">Amount:<span style="color: red;">*</span></label>
+            <input type="number" id="Amount" name="Amount" [(ngModel)]="newScholarship.Amount" required>
+            <div class="error-message" style="color: red;" *ngIf="scholarshipForm.submitted && scholarshipForm.controls['Amount']?.invalid">
+                Amount is required
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Sponsor">Sponsor:<span style="color: red;">*</span></label>
+            <input type="text" id="Sponsor" name="Sponsor" [(ngModel)]="newScholarship.Sponsor" required>
+            <div class="error-message" style="color: red;" *ngIf="scholarshipForm.submitted && scholarshipForm.controls['Sponsor']?.invalid">
+                Sponsor is required
+            </div>
+        </div>
+    </div>
+    <div class="button-group">
+        <button id="submit_button" type="submit">Submit</button>
+        <button type="button" (click)="router.navigate(['/viewscholarship'])">Back</button>
+    </div>
+    <div class="error-message" style="color: red;" *ngIf="scholarshipForm.submitted && !scholarshipForm.form.valid">
+        All fields are required
+    </div>
+    <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+    </div>
+</form>

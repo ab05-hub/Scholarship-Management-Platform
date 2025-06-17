@@ -1,0 +1,36 @@
+<div class="container">
+    <div class="card mt-3 mx-2">
+        <div class="card-header text-center">
+            <h1>Add Feedback</h1>
+        </div>
+        <div class="card-body">
+            <form #feedbackForm="ngForm" (ngSubmit)="addFeedback()">
+                <div class="form-group">
+                    <label for="FeedbackText">Feedback <span style="color: red;">*</span></label>
+                    <textarea type="FeedbackText" id="FeedbackText" name="FeedbackText" #feedbackText="ngModel"
+                        [(ngModel)]="newFeedback.FeedbackText" class="form-control" required></textarea>
+                    <div *ngIf="feedbackText.touched && feedbackText.invalid" class="text-danger">
+                        Feedback is required
+                    </div>
+                </div>
+ 
+               
+                <div *ngIf="feedbackForm.invalid" class="text-danger">
+                    All fields are required
+                </div>
+ 
+                <button [disabled]="feedbackForm.invalid" type="submit" class="btn btn-success form-control">Submit</button>
+ 
+            </form>
+        </div>
+    </div>
+</div>
+ 
+ 
+ 
+<div *ngIf="isUserDialogOpen" class="dialog">
+    <div class="dialog-content">
+        <p><b>Successfully Added!</b></p>
+        <button class="btn btn-danger" (click)="closeDialog()" routerLink="/userviewfeedback">OK</button>
+    </div>
+</div>

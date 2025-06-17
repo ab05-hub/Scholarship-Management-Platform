@@ -1,0 +1,45 @@
+<div>
+    <h1> Available Scholarship Plans </h1>
+    <hr class="heading-line">
+    <input type="text" id="searchInput" placeholder="Search Scholarships" [(ngModel)]="searchQuery" (input)="searchScholarship()">
+  
+    <table>
+      <thead>
+        <tr>
+          <th>S.No</th>
+          <th>Scholarship Name</th>
+          <th>Description</th>
+          <th>Eligibility Criteria</th>
+          <th>Application Deadline</th>
+          <th>Scholarship Amount</th>
+          <th>Category</th>
+          <th>Sponsor</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let scholarship of filteredScholarships | paginate: { itemsPerPage: itemsPerPage, currentPage: page }; let i = index">
+          <td>{{(page - 1) * itemsPerPage + i + 1}}</td>
+          <td>{{scholarship.Name}}</td>
+          <td>{{scholarship.Description}}</td>
+          <td>{{scholarship.EligibilityCriteria}}</td>
+          <td>{{scholarship.Deadline | date:'mediumDate'}}</td>
+          <td>{{scholarship.Amount}}</td>
+          <td>{{scholarship.Category}}</td>
+          <td>{{scholarship.Sponsor}}</td>
+          <td>
+            <button *ngIf="!isApplied(scholarship.ScholarshipId)" [routerLink]="['/scholarshipform', scholarship.ScholarshipId]">
+              Apply
+            </button>
+            <button class="isApplied" *ngIf="isApplied(scholarship.ScholarshipId)" disabled>
+              Applied
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p id="noRecordsFound" style="display:none;">Oops! No records found</p>
+  
+    <pagination-controls (pageChange)="page = $event"></pagination-controls>
+  </div>
+  

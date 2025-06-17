@@ -1,0 +1,75 @@
+<div class="scholarship-container">
+  <h2 class="title">Scholarship Plans</h2>
+  <hr class="title-underline">
+  <input type="text" [(ngModel)]="searchTerm" placeholder="Search by Name or Description" class="search-box" />
+  <table>
+    <thead>
+      <tr>
+        <th>S.No</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Eligibility Criteria</th>
+        <th (click)="sortScholarships('Amount')">Amount (₹)
+          <span class="sort-arrows">
+            <span [ngClass]="{'active': sortField === 'Amount' && sortOrder === 'asc'}">▲</span>
+            <span [ngClass]="{'active': sortField === 'Amount' && sortOrder === 'desc'}">▼</span>
+          </span>
+        </th>
+        <th>Deadline</th>
+        <th>Category</th>
+        <th (click)="sortScholarships('NumberOfAwards')">Number Of Awards
+          <span class="sort-arrows">
+            <span [ngClass]="{'active': sortField === 'NumberOfAwards' && sortOrder === 'asc'}">▲</span>
+            <span [ngClass]="{'active': sortField === 'NumberOfAwards' && sortOrder === 'desc'}">▼</span>
+          </span>
+        </th>
+        <th>Number of Applications</th> <!-- New Column -->
+        <th>Sponsor</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let scholarship of filteredScholarships() | paginate: { itemsPerPage: 4, currentPage: page}; let i = index">
+        <td>{{ i + 1 }}</td>
+        <td>{{ scholarship.Name }}</td>
+        <td>{{ scholarship.Description }}</td>
+        <td>{{ scholarship.EligibilityCriteria }}</td>
+        <td class="right-align">{{ scholarship.Amount }}</td>
+     
+        <td style="width: 100px;">{{ scholarship.Deadline | date:'mediumDate' }}</td>
+        <td>{{ scholarship.Category }}</td>
+        <td class="right-align">{{ scholarship.NumberOfAwards }}</td>
+        <td class="right-align">{{ scholarship.ScholarshipId !== undefined ? applicationCounts[scholarship.ScholarshipId] || 0 : 0 }}</td> <!-- Display Application Count -->
+
+        <td>{{ scholarship.Sponsor }}</td>
+        <td>
+          <button class="edit-button" (click)="editScholarship(scholarship)">Edit</button>
+          <button class="delete-button" (click)="openDialogue(scholarship)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <pagination-controls class="pagination-controls" (pageChange)="pageChanged($event)"></pagination-controls>
+
+
+</div>
+
+<!-- Custom Popup Dialog -->
+<div class="modal" *ngIf="isDialogueOpen">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <p>Please Confirm to Delete {{ selectedScholarship?.Name }}?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="confirm-delete-button" (click)="deleteScholarship()">Yes, Delete</button>
+        <button class="close-button" (click)="closeDialogue()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Popup Message -->
+<div class="popup-message" [ngClass]="{'success-message': isSuccess, 'error-message': !isSuccess}" *ngIf="popupMessage">
+  {{ popupMessage }}
+</div>

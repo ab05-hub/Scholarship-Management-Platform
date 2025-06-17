@@ -1,0 +1,73 @@
+<h1>Scholarship Requests for Approval</h1>
+<tr class="line"></tr>
+<div class="filter-container">
+    <input type="text" id="investmentType" name="investmentType" placeholder="Search By Scholarship Name"
+        [(ngModel)]="searchByScholarshipName" (input)="filterByScholarshipName()">
+    <label for="filterByStatus">Filter By Status</label>
+    <select name="filterByStatus" id="filterByStatus" [(ngModel)]="filterByScholarshipStatus"
+        (change)="filterByStatus()">
+        <option value="All">All</option>
+        <option value="Pending">Pending</option>
+        <option value="Approved">Approved</option>
+        <option value="Rejected">Rejected</option>
+    </select>
+</div>
+<table>
+    <thead>
+        <tr>
+            <th>SNo.</th>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Scholarship Amount(INR)</th>
+            <th>Application Date</th>
+            <th>Essay</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody *ngIf="tempScholarshipApplication.length > 0">
+        <tr *ngFor="let item of tempScholarshipApplication | paginate: { itemsPerPage: 4, currentPage: page}; let i = index">
+            <td>{{i+1}}</td>
+            <td>{{item.User?.Username}}</td>
+            <td>{{item.Scholarship?.Name}}</td>
+            <td class="right-align">{{item.Scholarship?.Amount}}</td>
+            <td>{{item.ApplicationDate | date:'mediumDate'}}</td>
+            <td>{{item.Essay}}</td>
+            <!-- <td>{{currentStatus}}</td> -->
+            <td>{{item.ApplicationStatus}}</td>
+            <td>
+                <button (click)="openDialogue(item)">Show More</button>
+                <button *ngIf="!statusTracker[item.ScholarshipId]?.isApproved"
+                    (click)="approveScholarship(item)">Approve</button>
+                <button *ngIf="!statusTracker[item.ScholarshipId]?.isRejected"
+                    (click)="rejectScholarship(item)">Reject</button>
+            </td>
+        </tr>
+    </tbody>
+    <div *ngIf="tempScholarshipApplication.length == 0">
+        Oops! No Record Found.
+    </div>
+</table>
+<pagination-controls class="pagination-controls" (pageChange)="pageChanged($event)"></pagination-controls>
+
+<div class="modal" tabindex="-1" role="dialog" [ngClass]="{'show': isProfileModalOpen}"
+    aria-labelledby="profileModalLabel" aria-hidden="true" style="display: block;" *ngIf="isDialogOpen">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center" style="font-family: 'Gilroy-Medium',sans-serif;">
+                <p *ngIf="selectedScholarshipApplication"><strong>Application Date: </strong>{{selectedScholarshipApplication.ApplicationDate | date}}</p>
+                <p *ngIf="selectedScholarshipApplication"><strong>Essay: </strong>{{selectedScholarshipApplication.Essay}}</p>
+                <p><strong>Proof: </strong>Proof.pdf</p>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" (click)="closeDialogue()">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
